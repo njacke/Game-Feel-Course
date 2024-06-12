@@ -41,6 +41,12 @@ TagManager:
   - name: Backdrop
     uniqueID: 3511883605
     locked: 0
+  - name: No Light
+    uniqueID: 2916303771
+    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: VFX
+    uniqueID: 589656785
     locked: 0
