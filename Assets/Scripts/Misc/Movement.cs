@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class Movement : MonoBehaviour
 {
+    public bool CanMove => _canMove;
+
     [SerializeField] private float _moveSpeed = 10f;
     
     private float _moveX;

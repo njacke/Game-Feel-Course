@@ -17,8 +17,12 @@ public class DeathSplatterHandler : MonoBehaviour
         GameObject newSplatterPrefab = Instantiate(sender.SplatterPrefab, sender.transform.position, sender.transform.rotation);
         SpriteRenderer deathSplatterSpriteRenderer = newSplatterPrefab.GetComponent<SpriteRenderer>();
         ColorChanger colorChanger = sender.GetComponent<ColorChanger>();
-        Color currentColor = colorChanger.DefaultColor;
-        deathSplatterSpriteRenderer.color = currentColor;
+
+        if (colorChanger) {
+            Color currentColor = colorChanger.DefaultColor;
+            deathSplatterSpriteRenderer.color = currentColor;
+        }
+        
         newSplatterPrefab.transform.SetParent(this.transform); // keeping hierarchy and layering organized        
     }
 
@@ -26,8 +30,12 @@ public class DeathSplatterHandler : MonoBehaviour
         GameObject newDeathVFX = Instantiate(sender.DeathVFX, sender.transform.position, sender.transform.rotation);
         ParticleSystem.MainModule ps = newDeathVFX.GetComponent<ParticleSystem>().main;
         ColorChanger colorChanger = sender.GetComponent<ColorChanger>();
-        Color currentColor = colorChanger.DefaultColor;
-        ps.startColor = currentColor;
+
+        if (colorChanger) {
+            Color currentColor = colorChanger.DefaultColor;
+            ps.startColor = currentColor;
+        }
+
         newDeathVFX.transform.SetParent(this.transform);
     }    
 }

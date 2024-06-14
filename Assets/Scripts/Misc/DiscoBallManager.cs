@@ -11,7 +11,7 @@ public class DiscoBallManager : MonoBehaviour
 
     private float _defaultGlobalLightIntensity;
     private Coroutine _discoRoutine;
-    private static Action OnDiscoBallHitEvent;
+    public static Action OnDiscoBallHitEvent;
 
     private ColorSpotlight[] _allSpotlights;
 

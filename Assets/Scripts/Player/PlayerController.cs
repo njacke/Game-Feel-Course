@@ -8,8 +8,11 @@ public class PlayerController : MonoBehaviour
     public Vector2 MoveInput => _frameInput.Move;
 
     public static Action OnJump;
+    public static Action OnJetpack;
+
     public static PlayerController Instance;
 
+    [SerializeField] private TrailRenderer _jetpackTrailRenderer;
     [SerializeField] private Transform _feetTransform; // drag object in
     [SerializeField] private Vector2 _groundCheck; // modify in inspector
     [SerializeField] private LayerMask _groundLayer;
@@ -17,13 +20,16 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _extraGravity = 700f;
     [SerializeField] private float _gravityDelay = .2f;
     [SerializeField] private float _coyoteTime = .5f;
+    [SerializeField] private float _jetpackTime = .6f;
+    [SerializeField] private float _jetpackStrength = 11f;
+    [SerializeField] private float _maxFallSpeedVelocity = -20f;
     
     private float _timeInAir, _coyoteTimer;
     private bool _doubleJumpAvailable;
+    private Coroutine _jetpackRoutine;
 
     private PlayerInput _playerInput;
     private FrameInput _frameInput;
-
     private Rigidbody2D _rigidBody;
     private Movement _movement;
 
@@ -37,10 +43,12 @@ public class PlayerController : MonoBehaviour
 
     private void OnEnable() {
         OnJump += ApplyJumpForce;
+        OnJetpack += StartJetpack;
     }
 
     private void OnDisable() {
         OnJump -= ApplyJumpForce;
+        OnJetpack -= StartJetpack;
     }
 
     private void Update() {
@@ -50,11 +58,17 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleSpriteFlip();
         GravityDelay();
+        Jetpack();
     }
 
 
     private void FixedUpdate() {
         ExtraGravity();
+    }
+
+    private void OnDestroy() {
+        Fade fade = FindFirstObjectByType<Fade>();
+        fade?.FadeInAndOut();
     }
 
     public bool CheckGrounded() {
@@ -79,6 +93,9 @@ public class PlayerController : MonoBehaviour
     private void ExtraGravity() {
         if (_timeInAir > _gravityDelay) {
             _rigidBody.AddForce(new Vector2(0f, -_extraGravity * Time.deltaTime));
+            if (_rigidBody.velocity.y < _maxFallSpeedVelocity) {
+                _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _maxFallSpeedVelocity);
+            }
         }
     }
 
@@ -132,4 +149,28 @@ public class PlayerController : MonoBehaviour
             transform.eulerAngles = new Vector3(0f, 0f, 0f);
         }
     } 
+
+    private void Jetpack() {
+        if (!_frameInput.Jetpack || _jetpackRoutine != null) return;
+
+        OnJetpack?.Invoke();
+    }
+
+    private void StartJetpack() {
+        _jetpackRoutine = StartCoroutine(JetpackRoutine());        
+    }
+
+    private IEnumerator JetpackRoutine() {
+        _jetpackTrailRenderer.emitting = true;
+
+        float jetTime = 0f;
+        while (jetTime < _jetpackTime) {
+            jetTime += Time.deltaTime;
+            _rigidBody.velocity = Vector2.up * _jetpackStrength;
+            yield return null;
+        }
+
+        _jetpackTrailRenderer.emitting = false;
+        _jetpackRoutine = null;
+    }
 }
